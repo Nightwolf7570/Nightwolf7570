@@ -1,16 +1,15 @@
-## Hi there 👋
+<div align="center">
 
-<!--
-**Nightwolf7570/Nightwolf7570** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## ⏳ You're looking at the past. Scroll down for it — but 2027 already happened here.
 
-Here are some ideas to get you started:
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/graph-2027-dark.svg">
+  <img alt="My 2027 contribution graph: five hearts across a year that hasn't happened yet" src="assets/graph-2027-light.svg">
+</picture>
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+Five hearts, committed to the future. GitHub unlocks the 2027 button on New Year's Day —
+**[or see it live right now →](https://github.com/Nightwolf7570?tab=overview&from=2027-01-01&to=2027-12-31)**
+
+</div>
+
+<!-- capsule v2 -->
