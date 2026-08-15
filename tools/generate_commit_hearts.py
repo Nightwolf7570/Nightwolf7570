@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "assets" / "graph-2027-light.svg"
 STL_OUTPUT = ROOT / "assets" / "commit-hearts.stl"
-SVG_OUTPUT = ROOT / "assets" / "commit-hearts-3d.svg"
+SVG_OUTPUT = ROOT / "assets" / "commit-hearts-only.svg"
 
 BACKGROUND = "#ebedf0"
 DEPTHS = {
