@@ -7,7 +7,6 @@ import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from xml.sax.saxutils import escape
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -125,9 +124,10 @@ def project(vertex: tuple[float, float, float], scale: float, center_x: float, b
     return (center_x + x * scale, baseline - z * scale + depth * scale * 0.10)
 
 
-def svg_frame(cells: list[Cell], angle: float) -> str:
+def svg_frame(cells: list[Cell], angle: float) -> tuple[str, float, float]:
     model_center = (max(cell.col for cell in cells) * CELL_PITCH + CELL_SIZE) / 2
     faces: list[tuple[float, str]] = []
+    y_values: list[float] = []
     for cell in cells:
         vertices = [rotate(vertex, angle, model_center) for vertex in cuboid_vertices(cell)]
         for indices, normal in FACES:
@@ -137,48 +137,44 @@ def svg_frame(cells: list[Cell], angle: float) -> str:
                 continue
             face_vertices = [vertices[index] for index in indices]
             average_depth = sum(vertex[1] for vertex in face_vertices) / 4
-            points = " ".join(
-                f"{fmt(x)},{fmt(y)}"
-                for x, y in (project(vertex, 10.7, 380, 174) for vertex in face_vertices)
-            )
+            projected = [project(vertex, 10.7, 380, 132) for vertex in face_vertices]
+            y_values.extend(y for _, y in projected)
+            points = " ".join(f"{fmt(x)},{fmt(y)}" for x, y in projected)
             light = 0.72 + 0.16 * max(0, -normal_y) + 0.12 * max(0, -normal_z)
             color = shade(cell.color, light)
             faces.append((average_depth, f'<polygon points="{points}" fill="{color}" stroke="#0d4429" stroke-width="0.45"/>'))
     faces.sort(key=lambda item: item[0], reverse=True)
-    return "".join(face for _, face in faces)
+    return "".join(face for _, face in faces), min(y_values), max(y_values)
 
 
 def write_svg(cells: list[Cell]) -> None:
     frame_count = 28
     duration = 9.8
     groups = []
+    min_y = math.inf
+    max_y = -math.inf
     for frame in range(frame_count):
         angle = math.radians(30) * math.sin(2 * math.pi * frame / frame_count)
         values = ["0"] * (frame_count + 1)
         values[frame] = "1"
         values[-1] = values[0]
         key_times = ";".join(fmt(index / frame_count) for index in range(frame_count + 1))
+        frame_svg, frame_min_y, frame_max_y = svg_frame(cells, angle)
+        min_y = min(min_y, frame_min_y)
+        max_y = max(max_y, frame_max_y)
         groups.append(
             '<g opacity="0">'
             f'<animate attributeName="opacity" values="{";".join(values)}" keyTimes="{key_times}" '
             f'calcMode="discrete" dur="{duration}s" repeatCount="indefinite"/>'
-            f"{svg_frame(cells, angle)}</g>"
+            f"{frame_svg}</g>"
         )
 
-    title = escape("Five hearts · 135 commits · one rotatable object")
+    view_top = math.floor(min_y)
+    view_bottom = math.ceil(max_y)
+    view_height = view_bottom - view_top
     svg = (
-        '<svg xmlns="http://www.w3.org/2000/svg" width="760" height="232" viewBox="0 0 760 232" role="img" '
-        f'aria-label="{title}">'
-        '<style>'
-        'text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}'
-        '.label{fill:#57606a}.title{fill:#1f2328}'
-        '@media(prefers-color-scheme:dark){.label{fill:#8c959f}.title{fill:#f0f6fc}}'
-        '</style>'
-        f'<title>{title}</title>'
-        '<text class="title" x="380" y="20" text-anchor="middle" font-size="13" font-weight="600">'
-        'THE 2027 CONTRIBUTION FIELD / EXTRUDED</text>'
-        '<text class="label" x="380" y="218" text-anchor="middle" font-size="11">'
-        'click the artifact, then drag to rotate it yourself</text>'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="760" height="{view_height}" '
+        f'viewBox="0 {view_top} 760 {view_height}">'
         + "".join(groups)
         + "</svg>\n"
     )
