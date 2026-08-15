@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D contribution hearts → GitHub stats</title>
+  <style>
+    :root { color-scheme: light; --bg: #f6f8fa; --panel: #fff; --text: #1f2328; --muted: #57606a; --border: #d0d7de; }
+    :root[data-theme="dark"] { color-scheme: dark; --bg: #0d1117; --panel: #0d1117; --text: #f0f6fc; --muted: #8c959f; --border: #30363d; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { width: min(920px, calc(100% - 32px)); margin: 56px auto; }
+    header { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    .actions { display: flex; gap: 8px; }
+    button { padding: 7px 12px; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; }
+    .readme { padding: 28px; overflow: hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; }
+    img { display: block; width: 100%; height: auto; }
+    @media (max-width: 620px) { main { margin: 24px auto; } .readme { padding: 12px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="actions">
+        <button id="replay" type="button">Replay</button>
+        <button id="theme" type="button">Dark mode</button>
+      </div>
+    </header>
+    <section class="readme" aria-label="GitHub README preview">
+      <img id="banner" src="assets/commit-hearts-stats.svg" alt="Five rotating 3D contribution hearts drift into GitHub statistics">
+    </section>
+  </main>
+  <script>
+    const root = document.documentElement;
+    const banner = document.getElementById('banner');
+    const theme = document.getElementById('theme');
+    const reload = () => {
+      const t = Date.now();
+      banner.src = `assets/commit-hearts-stats.svg?t=${t}`;
+    };
+    document.getElementById('replay').addEventListener('click', reload);
+    theme.addEventListener('click', () => {
+      const dark = root.dataset.theme !== 'dark';
+      root.dataset.theme = dark ? 'dark' : 'light';
+      theme.textContent = dark ? 'Light mode' : 'Dark mode';
+      reload();
+    });
+  </script>
+</body>
+</html>
